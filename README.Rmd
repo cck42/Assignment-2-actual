@@ -2,7 +2,7 @@
 title: "Assignment 2"
 author: "cck42"
 date: "10/23/2019"
-output: html_document
+output: md_document
 ---
 
 ```{r setup, include=FALSE}

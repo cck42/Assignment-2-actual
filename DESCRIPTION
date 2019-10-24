@@ -1,13 +1,13 @@
 Package: bis557
-Title: What the Package Does (One Line, Title Case)
+Title: Ridge Regression
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Chaney",
+           family = "Kalinich",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
+           email = "chaney.kalinich@yale.edu",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: This package was written for assignment 2 of BIS 557, fall 2019. The ridge_regress function takes a data set, formula, and an optional list of ridge regression penalties. The output is a penalty (lambda value) optimized for a test and training set
 License: What license it uses
 Encoding: UTF-8
 LazyData: true

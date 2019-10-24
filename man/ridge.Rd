@@ -4,14 +4,14 @@
 \alias{ridge}
 \title{Ridge regression function}
 \usage{
-ridge(X, y, lambdas = 0)
+ridge(X, y, lambdas)
 }
 \arguments{
 \item{form, }{an R  formula to construct the regression}
 
 \item{data, }{the data to use for the regression}
 
-\item{lambda, }{an optional set of lambdas to use for regression}
+\item{lambda, }{an optional set of penalties to use for regression}
 }
 \description{
 Assignment 2 for BIS 557

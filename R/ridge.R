@@ -7,7 +7,7 @@
 #'
 #' @param form, an R  formula to construct the regression
 #' @param data, the data to use for the regression
-#' @param lambda, an optional set of lambdas to use for regression
+#' @param lambda, an optional set of penalties to use for regression
 #'
 #'
 
@@ -16,15 +16,14 @@
 #If no values are entered for lambda, it will return values for lambdas between 0 and 10 in increments of .1
 #------------------------------------------------------------------------------------------------------------
 
-ridge <- function(X, y, lambdas = 0){
+
+
+ridge <- function(X, y, lambdas){
   svd_X <- svd(X)
   U <- svd_X$u
   V <- svd_X$v
   svals <- svd_X$d
 
-  if(identical(lambdas,0)){
-    lambdas <- seq(from = 0, to = 10, by = 0.1)
-  }
   k <- length(lambdas)
   ridge <- matrix(nrow = k, ncol = ncol(X))
 
@@ -42,7 +41,7 @@ ridge <- function(X, y, lambdas = 0){
 #It takes a formula, data set, and optional set of lambdas to check and produces an optimal ridge regression
 #It uses 90% of the data for training and the other 10% for cross-validation to determine the best lambda
 #-------------------------------------------------------------------------------------------------------------
-ridge_regress <- function(form, data, lambda = 0){
+ridge_regress <- function(form, data, lambda = NULL){
   #make data into model matrix
   X <- model.matrix(form, data,  contrasts.arg = contrasts)
   Y <- matrix(data[,1],ncol = 1)
@@ -54,18 +53,19 @@ ridge_regress <- function(form, data, lambda = 0){
   y_train_set <- Y[train_rows]
   y_test_set <- Y[test_rows]
 
-  if(identical(lambda,0)){
+  if(is.null(lambda)){
     lambda <- seq(from = 0, to = 10, by = 0.1)
   }
-  k <- length(lambda)
 
   regressions <- ridge(train_set, y_train_set, lambdas = lambda)
   y_hat <- tcrossprod(test_set, regressions)
   mse <- apply((y_hat-y_test_set)^2,2,mean)
 
   best_L <- lambda[which.min(mse)]
+  betas <- regressions[(best_L*10+1),]
   #browser()
-  return(list(best_L, regressions[(best_L*10+1),]))
-
+  #return(list(best_L, regressions[(best_L*10+1),]))
+  output <- list(coef = betas, lambda = best_L)
+  return(output)
 }
 
