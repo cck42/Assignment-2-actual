@@ -9,6 +9,8 @@ output: md_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+#### Assignment 2, BIS 557
+
 This package is in response to assignment 2 in BIS 557. A few notes:
 
 The function ridge_regress() performs the ridge regression. It references ridge, which is a function that produces estimators for a series of lambda values.  

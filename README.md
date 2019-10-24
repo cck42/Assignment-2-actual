@@ -1,3 +1,5 @@
+#### Assignment 2, BIS 557
+
 This package is in response to assignment 2 in BIS 557. A few notes:
 
 The function ridge\_regress() performs the ridge regression. It
