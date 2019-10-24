@@ -11,6 +11,8 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(casl)
+library(MASS)
 ```
 
 ##### Question 1: CASL 2.11 problem 5  
@@ -120,6 +122,8 @@ $$
 \beta_1 = \sum_{n=1}^p y_n * (\sum_{n=1}^p x_n^2 - \sum_{n=1}^p x_n)
 $$
 
+***  
+
 ##### Question 4: Numerical Stability and Statistical Error  
 
 >Section 2.8 of CASL shows that as the numerical stability decreases, statistical errors increase. Reproduce
@@ -127,12 +131,72 @@ the results and then show that using ridge regression can increase numerical sta
 statistical error.  
 
 
+**Intuitive explanation:**  
+From equations 2.48 through 2.54, there were a few key points:  
++ The penalty in estimating v from AV (e.g. relative error between the two) is determined by $\frac{c_{max}}{c_{min}}$  
++ If the matrix in question (A) does not have full column rank, $c_min$ goes to zero (colinear or fewer observations than columns)  
++ If $c_min$ goes to zero, the penalty goes to infinity; the error in estimating v has an infinitely high (or at least very high) limit  
 
+But this is the theoretical limit to the computational error; it isn't necessarily that high. So in what cases do we approach this limit and not? The statistical error vector in any linear system becomes part of this error calculation; though it is possible to get the numerical error reduced to within the precision of whatever machine is being used, statistical error can't be changed. The statistical error is also multiplied by the same conversion factor, $\frac{c_{max}}{c_{min}}$. In this way, the numerical instability becomes significant.  
+
+**Example in R**  
+*(pretty much all of this is right out of CASL, with my own explanations)*  
+First, I'll make a matrix with some samples randomly sampled from the normal distribution and a dummy regression vector, beta:
+```{r}
+n <- 1000; p <- 25
+beta <- c(1,rep(0,p-1))
+X <- matrix(rnorm(n*p),ncol=p)
+
+svals <- svd(X)$d
+cond <- max(svals)/min(svals)
+print(c("The condition number for X is: ",cond))
+```
+So, this condition isn't crazy high. Let's calculate the MSE:
+```{r}
+N<-1e4
+errors <- rep(0,N)
+for(k in 1:N){
+  y <- X %*% beta + rnorm(n)
+  betahat <- casl_ols_svd(X,y)
+  errors[k] <- sqrt(sum((betahat-beta)^2))
+}
+avg_error <- mean(errors)
+print(c("The mean squared error for X is: ",avg_error))
+```
+This MSE is acceptable! Now, I'm going to do the same thing, but instead of randomly sampling from the normal distribution, I'm going to take this exact matrix and make the first column a product of the original first and second columns. This means that the first two columns are highly colinear.
+```{r}
+alpha <- 0.001
+X[,1]<-alpha + X[,2]*(1-alpha)
+svals_new <- svd(X)$d
+cond_new <- max(svals_new)/min(svals_new)
+print(c("The condition matrix when two columns are colinear is: ",cond_new))
+```
+So, this is now crazy high.
+```{r}
+errors <- rep(0,N)
+for(k in 1:N){
+  y <- X %*% beta + rnorm(n)
+  betahat <- casl_ols_svd(X,y)
+  errors[k] <- sqrt(sum((betahat-beta)^2))
+}
+avg_error_new <- mean(errors)
+print(c("The mean squared error for when two columns are colinear is: ",avg_error_new))
+```
+
+Now, to show that it works in ridge regression:
+```{r}
+beta <- t(bis557::ridge(X,y, lambdas = 0))
+errors[k] <- sqrt(sum((betahat-beta)^2))
+avg_error_rr <- mean(errors)
+print(c("the mean squared error using ridge regression is: ",avg_error_rr))
+```
+This shows how ridge regression reduces the MSE of a set with numerical instability
+
+***  
 ##### Question 5: LASSO Penalty
 >Consider the LASSO penalty
 $$
 \frac{1}{2n} ||Y − X \beta||_2^2 + \lambda||\beta||_1.
 $$
 Show that if $|X^T_j * Y | ≤ n * \lambda$, then $\beta^{LASSO}$ must be zero.  
-
 
