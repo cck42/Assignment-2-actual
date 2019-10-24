@@ -1,0 +1,12 @@
+This package is in response to assignment 2 in BIS 557. A few notes:
+
+The function ridge\_regress() performs the ridge regression. It
+references ridge, which is a function that produces estimators for a
+series of lambda values.
+
+The vingettes folder holds the solutions to the written theory
+questions. The homework-2 file is incomplete, but was pushed before
+midnight. The homework-2-complete file is complete but was submitted
+late (after midnight on 10/23). I separated it in order to have a
+separate timestamp, so it was clear what I completed on-time and what
+was late.

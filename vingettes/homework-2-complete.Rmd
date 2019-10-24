@@ -1,0 +1,138 @@
+---
+title: "Solutions to problems 1, 4, and 5 on homework 2"
+author: "cck42"
+date: "10/23/2019"
+output: html_document
+vignette: >
+  %\VignetteIndexEntry{"Assignment 2 solutions"}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##### Question 1: CASL 2.11 problem 5  
+The general form for a linear model is:  
+$$
+\hat \beta = (X^t * X)^{-1} X^T y
+$$
+where X is the set of predictor values and y is the response values.  
+
+In the case of a scalar X and an intercept:
+$$
+X = 
+\begin{matrix} 
+x_1 & 1 \\
+x_2 & 1 \\
+... & ... \\
+x_p & 1
+\end{matrix}
+$$
+and:  
+$$
+X^T =
+\begin{pmatrix} 
+x_1 & x_2 & ... & x_p \\
+1 & 1 & ... & 1 
+\end{pmatrix} \\ 
+$$
+$$
+X^T * X = 
+\begin{pmatrix} 
+x_1 & 1 \\
+x_2 & 1 \\
+... & ... \\
+x_p & 1
+\end{pmatrix}
+\begin{pmatrix} 
+x_1 & x_2 & ... & x_p \\
+1 & 1 & ... & 1
+\end{pmatrix} \\
+= \begin{pmatrix}
+\sum_{n=1}^p x_n^2 & \sum_{n=1}^p x_n \\
+\sum_{n=1}^p x_n & 1
+\end{pmatrix}
+$$
+The inverse of this is:
+$$
+\begin{pmatrix}
+1 & -\sum_{n=1}^p x_n \\
+-\sum_{n=1}^p x_n & \sum_{n=1}^p x_n^2
+\end{pmatrix}
+$$
+$X^T * y$ is:
+$$
+X^T * y = X^T = 
+\begin{pmatrix} 
+x_1 & x_2 & ... & x_p \\
+1 & 1 & ... & 1
+\end{pmatrix} *
+\begin{pmatrix}
+y_1 \\
+y_2 \\
+... \\
+y_p
+\end{pmatrix}\\
+=
+\begin{pmatrix}
+\sum_{n=1}^p x_n y_n \\
+\sum_{n=1}^p y_n
+\end{pmatrix}
+$$
+Putting these together, we get:
+$$
+\begin{pmatrix}
+1 & -\sum_{n=1}^p x_n \\
+-\sum_{n=1}^p x_n & \sum_{n=1}^p x_n^2
+\end{pmatrix} * \begin{pmatrix}
+\sum_{n=1}^p x_n y_n \\
+\sum_{n=1}^p y_n
+\end{pmatrix}n\\
+$$
+$$
+= \begin{pmatrix}
+\sum_{n=1}^p x_ny_n - (\sum_{n=1}^p x_n*\sum_{n=1}^p x_ny_n) \\
+-\sum_{n=1}^p x_n * \sum_{n=1}^p y_n + (\sum_{n=1}^p x_n^2 * \sum_{n=1}^p y_n)
+\end{pmatrix}
+$$
+Which simplifies to:
+$$
+\begin{pmatrix}
+\sum_{n=1}^p x_ny_n * (1-\sum_{n=1}^p x_n) \\
+\sum_{n=1}^p y_n * (\sum_{n=1}^p x_n^2 - \sum_{n=1}^p x_n)
+\end{pmatrix}
+$$
+Since this is equal to $\hat \beta$, and $\hat \beta = \begin{pmatrix} \hat \beta_0 \\ \hat \beta_1 \end{pmatrix}$:
+$$
+\hat \beta = 
+\begin{pmatrix} \hat \beta_0 \\
+\hat \ beta_1 \end{pmatrix}
+ = \begin{pmatrix}
+\sum_{n=1}^p x_ny_n * (1-\sum_{n=1}^p x_n) \\
+\sum_{n=1}^p y_n * (\sum_{n=1}^p x_n^2 - \sum_{n=1}^p x_n)
+\end{pmatrix}
+$$
+Our estimators are:
+$$
+\beta_0 = \sum_{n=1}^p x_ny_n * (1-\sum_{n=1}^p x_n) \\
+\beta_1 = \sum_{n=1}^p y_n * (\sum_{n=1}^p x_n^2 - \sum_{n=1}^p x_n)
+$$
+
+##### Question 4: Numerical Stability and Statistical Error  
+
+>Section 2.8 of CASL shows that as the numerical stability decreases, statistical errors increase. Reproduce
+the results and then show that using ridge regression can increase numerical stability and decrease
+statistical error.  
+
+
+
+##### Question 5: LASSO Penalty
+>Consider the LASSO penalty
+$$
+\frac{1}{2n} ||Y − X \beta||_2^2 + \lambda||\beta||_1.
+$$
+Show that if $|X^T_j * Y | ≤ n * \lambda$, then $\beta^{LASSO}$ must be zero.  
+
+

@@ -9,22 +9,8 @@ output: md_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+This package is in response to assignment 2 in BIS 557. A few notes:
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+The function ridge_regress() performs the ridge regression. It references ridge, which is a function that produces estimators for a series of lambda values.  
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+The vingettes folder holds the solutions to the written theory questions. The homework-2 file is incomplete, but was pushed before midnight. The homework-2-complete file is complete but  was submitted late (after midnight on 10/23). I separated it in order to have a separate timestamp, so it was clear what I completed on-time and what was late.
