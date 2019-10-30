@@ -13,6 +13,8 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 library(casl)
 library(MASS)
+
+devtools::load_all(".")
 ```
 
 ##### Question 1: CASL 2.11 problem 5  
@@ -43,30 +45,36 @@ $$
 $$
 X^T * X = 
 \begin{pmatrix} 
+x_1 & x_2 & ... & x_p \\
+1 & 1 & ... & 1
+\end{pmatrix}
+\begin{pmatrix} 
 x_1 & 1 \\
 x_2 & 1 \\
 ... & ... \\
 x_p & 1
-\end{pmatrix}
-\begin{pmatrix} 
-x_1 & x_2 & ... & x_p \\
-1 & 1 & ... & 1
 \end{pmatrix} \\
 = \begin{pmatrix}
 \sum_{n=1}^p x_n^2 & \sum_{n=1}^p x_n \\
-\sum_{n=1}^p x_n & 1
+\sum_{n=1}^p x_n & p
 \end{pmatrix}
 $$
 The inverse of this is:
 $$
+\frac{1}{p*\sum_{n=1}^p x_n^2-\sum_{n=1}^p x_n^2}
 \begin{pmatrix}
-1 & -\sum_{n=1}^p x_n \\
+p & -\sum_{n=1}^p x_n \\
 -\sum_{n=1}^p x_n & \sum_{n=1}^p x_n^2
-\end{pmatrix}
+\end{pmatrix} \\
+=\frac{1}{(p-1)*\sum_{n=1}^p x_n^2}
+\begin{pmatrix}
+p & -\sum_{n=1}^p x_n \\
+-\sum_{n=1}^p x_n & \sum_{n=1}^p x_n^2
+\end{pmatrix} \\
 $$
 $X^T * y$ is:
 $$
-X^T * y = X^T = 
+X^T * y = 
 \begin{pmatrix} 
 x_1 & x_2 & ... & x_p \\
 1 & 1 & ... & 1
@@ -83,43 +91,51 @@ y_p
 \sum_{n=1}^p y_n
 \end{pmatrix}
 $$
-Putting these together, we get:
+Putting these together for $(X^t * X)^{-1} X^T y$, we get:
 $$
+\frac{1}{(p-1)*\sum_{n=1}^p x_n^2} * 
 \begin{pmatrix}
-1 & -\sum_{n=1}^p x_n \\
+p & -\sum_{n=1}^p x_n \\
 -\sum_{n=1}^p x_n & \sum_{n=1}^p x_n^2
 \end{pmatrix} * \begin{pmatrix}
 \sum_{n=1}^p x_n y_n \\
 \sum_{n=1}^p y_n
-\end{pmatrix}n\\
-$$
-$$
-= \begin{pmatrix}
-\sum_{n=1}^p x_ny_n - (\sum_{n=1}^p x_n*\sum_{n=1}^p x_ny_n) \\
--\sum_{n=1}^p x_n * \sum_{n=1}^p y_n + (\sum_{n=1}^p x_n^2 * \sum_{n=1}^p y_n)
-\end{pmatrix}
+\end{pmatrix}\\
 $$
 Which simplifies to:
 $$
+= \frac{1}{(p-1)*\sum_{n=1}^p x_n^2} * 
 \begin{pmatrix}
-\sum_{n=1}^p x_ny_n * (1-\sum_{n=1}^p x_n) \\
-\sum_{n=1}^p y_n * (\sum_{n=1}^p x_n^2 - \sum_{n=1}^p x_n)
+p* \sum_{n=1}^p x_ny_n - \sum_{n=1}^p x_ny_n \\
+-\sum_{n=1}^p x_n^2 y_n + \sum_{n=1}^p x_n^2 y_n
+\end{pmatrix}
+$$
+And further simplifies to:
+$$
+= \frac{1}{(p-1)*\sum_{n=1}^p x_n^2} * 
+\begin{pmatrix}
+(p-1) * \sum_{n=1}^p x_ny_n \\
+0
+\end{pmatrix} \\
+= \begin{pmatrix}
+\sum_{n=1}^p \frac{y_n}{x_n} \\
+0
 \end{pmatrix}
 $$
 Since this is equal to $\hat \beta$, and $\hat \beta = \begin{pmatrix} \hat \beta_0 \\ \hat \beta_1 \end{pmatrix}$:
 $$
 \hat \beta = 
-\begin{pmatrix} \hat \beta_0 \\
-\hat \ beta_1 \end{pmatrix}
- = \begin{pmatrix}
-\sum_{n=1}^p x_ny_n * (1-\sum_{n=1}^p x_n) \\
-\sum_{n=1}^p y_n * (\sum_{n=1}^p x_n^2 - \sum_{n=1}^p x_n)
+\begin{pmatrix} \hat \beta_1 \\
+\hat \beta_0 \end{pmatrix}
+= \begin{pmatrix}
+\sum_{n=1}^p \frac{y_n}{x_n} \\
+0
 \end{pmatrix}
 $$
 Our estimators are:
 $$
-\beta_0 = \sum_{n=1}^p x_ny_n * (1-\sum_{n=1}^p x_n) \\
-\beta_1 = \sum_{n=1}^p y_n * (\sum_{n=1}^p x_n^2 - \sum_{n=1}^p x_n)
+\beta_1 = \sum_{n=1}^p \frac{y_n}{x_n} \\
+\beta_0 = 0
 $$
 
 ***  
@@ -153,6 +169,9 @@ print(c("The condition number for X is: ",cond))
 ```
 So, this condition isn't crazy high. Let's calculate the MSE:
 ```{r}
+n <- 1000; p <- 25
+beta <- c(1,rep(0,p-1))
+X <- matrix(rnorm(n*p),ncol=p)
 N<-1e4
 errors <- rep(0,N)
 for(k in 1:N){
@@ -165,6 +184,9 @@ print(c("The mean squared error for X is: ",avg_error))
 ```
 This MSE is acceptable! Now, I'm going to do the same thing, but instead of randomly sampling from the normal distribution, I'm going to take this exact matrix and make the first column a product of the original first and second columns. This means that the first two columns are highly colinear.
 ```{r}
+n <- 1000; p <- 25
+beta <- c(1,rep(0,p-1))
+X <- matrix(rnorm(n*p),ncol=p)
 alpha <- 0.001
 X[,1]<-alpha + X[,2]*(1-alpha)
 svals_new <- svd(X)$d
@@ -173,6 +195,9 @@ print(c("The condition matrix when two columns are colinear is: ",cond_new))
 ```
 So, this is now crazy high.
 ```{r}
+n <- 1000; p <- 25
+beta <- c(1,rep(0,p-1))
+X <- matrix(rnorm(n*p),ncol=p)
 errors <- rep(0,N)
 for(k in 1:N){
   y <- X %*% beta + rnorm(n)
@@ -185,7 +210,11 @@ print(c("The mean squared error for when two columns are colinear is: ",avg_erro
 
 Now, to show that it works in ridge regression:
 ```{r}
-beta <- t(bis557::ridge(X,y, lambdas = 0))
+n <- 1000; p <- 25
+beta <- c(1,rep(0,p-1))
+X <- matrix(rnorm(n*p),ncol=p)
+library(bis557)
+beta <- t(ridge(X,y, lambdas = 0))
 errors[k] <- sqrt(sum((betahat-beta)^2))
 avg_error_rr <- mean(errors)
 print(c("the mean squared error using ridge regression is: ",avg_error_rr))
@@ -199,4 +228,42 @@ $$
 \frac{1}{2n} ||Y − X \beta||_2^2 + \lambda||\beta||_1.
 $$
 Show that if $|X^T_j * Y | ≤ n * \lambda$, then $\beta^{LASSO}$ must be zero.  
+
+First, I will consider this for the simplest case, a single, scalar $\beta$. I will minimize:
+$$
+\frac{1}{2n}||Y-X\beta||^2 + \lambda ||\beta||, where \ X \in R^{n \times p},\ Y \in R^{n \times 1},\ \beta \in R^{p \times 1}
+$$
+
+for beta.
+
+For a given set of X and Y, the first (least squares) part  of this looks like
+```{r  echo=FALSE}
+beta = seq(from = -3, to = 3, by = .2)
+lambda = beta^2
+plot(lambda~beta, type = "l", xaxt='n', yaxt='n')
+```
+In order to find the $\beta$ that minimizes $\lambda$, I'm going to take the derivative of the formula above with respect  to $\beta$ and set it to zero. Because $\beta$ is in an absolute value, and therefore discontinuous, I'll do this separately for $\beta >0$ and $\beta<0$
+$$
+For\ \beta \geq 0 \\
+\begin{equation} \tag{Taking the  derivative}
+\frac{\partial}{\partial \beta} (\frac{1}{2n}\sum_{i=0}^p||Y_i-X_i\beta_i||^2+\lambda \beta) = \frac{1}{2n} \sum_{i=0}^p 2(Y_i-X_i\beta)*-X_i + \lambda \\
+= \frac{1}{n} \sum_{i=0}^p-(Y_i*X_i-\beta X_i^2) + \lambda
+\end{equation}
+$$
+$$
+\begin{equation} \tag{Minimizing}
+0 = \frac{1}{n} \sum_{i=0}^p(\beta X_i^2 - Y_i*X_i-\beta X_i^2) + \lambda \\
+\sum_{i=0}^p \beta X_i^2 = \sum_{i=0}^p X_iY_i - n\lambda\\
+\hat \beta=\frac{\sum_{i=0}^p X_iY_i-n\lambda}{\sum_{i=0}^pX_i}
+\end{equation}
+$$
+If $|X_i^TY|\leq n \lambda$,and assuming X is orthogonal:
+$$
+|X_i^TY| = \sum_{i=0}^p X_iY_i \leq n \lambda\\
+$$
+And putting this into my derivative from above
+$$
+\hat \beta=\frac{\sum_{i=0}^p X_iY_i- \sum_{i=0}^pX_iY_i }{\sum_{i=0}^pX_i} \\
+= 0\\
+$$
 
